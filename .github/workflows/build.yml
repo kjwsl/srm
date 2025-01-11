@@ -1,0 +1,22 @@
+name: Build Rust Project
+on: [pull_request, push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    - name: Build
+      run: cargo build --verbose
+    - name: Test
+      run: cargo test --verbose
+    - name: Lint
+      run: cargo clippy --verbose
+    - name: Format
+      run: cargo fmt -- --check
+    - name: Check
+      run: cargo check --verbose
