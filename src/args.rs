@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use crate::error::{Error, ErrorKind};
+
 // TODO: Do I want to allow 2+ time conditions?
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum TimeCondition {
@@ -122,7 +124,7 @@ pub struct ParsedArgs {
 pub struct ArgParser;
 
 impl ArgParser {
-    pub fn parse(args: &[String]) -> Result<ParsedArgs, String> {
+    pub fn parse(args: &[String]) -> Result<ParsedArgs, Error> {
         let mut parsed_args = ParsedArgs::default();
         let mut i = 1;
         let mut found_file_str = false;
@@ -150,49 +152,78 @@ impl ArgParser {
                 }
 
                 _ => {
-                    return Err(format!("Unknown argument: {}", args[i]));
+                    return Err(Error::new(ErrorKind::InvalidArg(format!(
+                        "Invalid argument: {}",
+                        args[i]
+                    ))));
                 }
             }
             i += 1;
         }
 
         if !found_file_str {
-            return Err("No file specified".to_string());
+            return Err(Error::new(ErrorKind::InvalidArg(
+                "No file string found".to_string(),
+            )));
         }
 
         Ok(parsed_args)
     }
 
     // TODO: Implement it to support a mix of units.
-    fn parse_life_duration(duration: &str) -> Result<u32, String> {
+    fn parse_life_duration(duration: &str) -> Result<u32, Error> {
         let (value, unit) = duration.split_at(duration.len() - 1);
-        let value = value.parse::<u32>().map_err(|_| "Invalid value")?;
+        let value = value.parse::<u32>().map_err(|_| {
+            Error::new(ErrorKind::ParseError(format!(
+                "Failed to parse an integer: {}",
+                value
+            )))
+        })?;
         match unit.to_lowercase().as_str() {
             "h" => Ok(value),
             "d" => Ok(value * 24),
             "w" => Ok(value * 24 * 7),
-            _ => Err("Invalid unit".to_string()),
+            _ => Err(Error::new(ErrorKind::ParseError(
+                "Failed to parse duration unit".to_string(),
+            ))),
         }
     }
 
-    fn parse_file_size(size: &str) -> Result<u32, String> {
-        let (value, unit) = size.split_at(size.len() - 1);
-        let value = value.trim().parse::<u32>().map_err(|_| "Invalid value")?;
+    fn parse_file_size(size_str: &str) -> Result<u32, Error> {
+        if size_str.is_empty() {
+            return Err(Error::new(ErrorKind::InvalidArg(
+                "String is empty".to_string(),
+            )));
+        }
+        let (value, unit) = size_str.split_at(size_str.len() - 1);
+        let value = value
+            .trim()
+            .parse::<u32>()
+            .map_err(|e| Error::new(ErrorKind::ParseError(e.to_string())))?;
         match unit.trim().to_lowercase().as_str() {
             "k" | "kb" => Ok(value * 1024),
             "m" | "mb" => Ok(value * 1024 * 1024),
             "g" | "gb" => Ok(value * 1024 * 1024 * 1024),
-            _ => Err("Invalid unit".to_string()),
+            _ => Err(Error::new(ErrorKind::ParseError(
+                "Failed to parse size unit".to_string(),
+            ))),
         }
     }
 
-    fn parse_file_str(file_str: &str) -> Result<Vec<PathBuf>, String> {
+    fn parse_file_str(file_str: &str) -> Result<Vec<PathBuf>, Error> {
         if file_str.is_empty() {
-            return Err("No file specified".to_string());
+            return Err(Error::new(ErrorKind::ParseError(
+                "Empty file string".to_string(),
+            )));
         }
 
         std::fs::canonicalize(file_str)
             .map(|path| vec![path])
-            .map_err(|e| e.to_string())
+            .map_err(|e| {
+                Error::new(ErrorKind::ParseError(format!(
+                    "Failed to parse file: {}",
+                    e
+                )))
+            })
     }
 }

@@ -1,7 +1,4 @@
-use std::{
-    io::{Error, ErrorKind},
-    path::PathBuf,
-};
+use std::io::{Error, ErrorKind};
 
 use crate::{
     args::{Flags, ParsedArgs, RemoveCondBuilder, TimeCondition},
