@@ -1,25 +1,31 @@
-use srm::{args::ArgParser, core::Srm};
+use std::process;
 
-fn main() {
-    let args = std::env::args().collect::<Vec<String>>();
+use clap::Parser;
+use colored::Colorize;
+use srm::cli::Commands;
+use srm::commands::{list_command, remove_command, restore_command};
+use srm::{cli::Cli, config::Config};
 
-    if args.len() < 2 {
-        eprintln!("Usage: srm <file1> <file2> ...");
-        std::process::exit(1);
-    }
+#[tokio::main]
+async fn main() {
+    let cli = Cli::parse();
 
-    let srm = Srm::new();
-    match ArgParser::parse(&args) {
-        Ok(parsed_args) => match srm.run(&parsed_args) {
-            Ok(_) => {}
-            Err(e) => {
-                eprintln!("{}", e);
-                std::process::exit(1);
-            }
-        },
+    let config = match Config::load() {
+        Ok(c) => c,
         Err(e) => {
-            eprintln!("{}", e);
-            std::process::exit(1);
+            eprintln!("{}: {}", "Error".red(), e);
+            process::exit(1);
         }
+    };
+
+    let result = match cli.command {
+        Commands::Remove { duration, files } => remove_command(&config, duration, files).await,
+        Commands::Restore { files } => restore_command(files).await,
+        Commands::List => list_command().await,
+    };
+
+    if let Err(e) = result {
+        eprintln!("{}: {}", "Error".red(), e);
+        process::exit(1);
     }
 }

@@ -6,7 +6,7 @@ use std::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::args::RemoveCond;
+use crate::cli::RemoveCond;
 
 // Relative to home directory
 const PROG_USER_DATA_DIR: &str = ".local/share/srm";
@@ -215,7 +215,7 @@ impl FileManager {
 
 #[cfg(test)]
 mod tests {
-    use crate::args::{RemoveCondBuilder, TimeCondition};
+    use crate::cli::{RemoveCondBuilder, TimeCondition};
 
     use super::*;
 

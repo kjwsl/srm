@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    args::{Flags, ParsedArgs, RemoveCondBuilder, TimeCondition},
+    cli::{Flags, ParsedArgs, RemoveCondBuilder, TimeCondition},
     file_manager::FileManager,
 };
 
