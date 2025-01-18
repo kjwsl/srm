@@ -3,7 +3,10 @@ use clap::{arg, Parser, Subcommand};
 #[derive(Parser, Debug)]
 #[command(name = "srm", version = "1.0")]
 #[command(author = "larpi")]
-#[command(about = "Securely remove files or directories", long_about = "This command removes files or directories by overwriting them with random data.")]
+#[command(
+    about = "Securely remove files or directories",
+    long_about = "This command removes files or directories by overwriting them with random data."
+)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
