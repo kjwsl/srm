@@ -1,0 +1,9 @@
+[target.aarch64-apple-darwin]
+linker = "clang"
+rustflags = [
+  "-C", "link-arg=-framework",
+  "-C", "link-arg=CoreFoundation",
+  "-C", "link-arg=-framework",
+  "-C", "link-arg=System",
+]
+
