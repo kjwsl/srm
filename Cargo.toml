@@ -1,7 +1,11 @@
 [package]
-name = "srm"
+name = "safe-remove"
 version = "0.1.0"
 edition = "2021"
+authors = ["ray <kjwdev01@gmail.com> "]
+description = "Safe Remove (srm): Move files to a safe location instead of deleting them immediately."
+license = "MIT" 
+repository = "https://github.com/kjwsl/srm"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
