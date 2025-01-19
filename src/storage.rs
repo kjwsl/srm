@@ -97,6 +97,10 @@ impl StorageManager {
         self.save_metadata()
     }
 
+    pub fn get_safe_files(&self) -> Vec<&SafeFile> {
+        self.safe_files.iter().collect()
+    }
+
     pub fn list_files(&self) {
         if self.safe_files.is_empty() {
             println!("No files stored in the safe storage");

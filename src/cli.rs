@@ -1,5 +1,4 @@
 use clap::{arg, Parser, Subcommand};
-
 #[derive(Parser, Debug)]
 #[command(name = "srm", version = "1.0")]
 #[command(author = "larpi")]
@@ -24,8 +23,12 @@ pub enum Commands {
 
     /// Restore previously removed files to their original locations
     Restore {
+        /// Restore all files
+        #[arg(short, long)]
+        all: bool,
+
         /// Files to restore (specify file names as listed in storage)
-        #[arg(required = true, value_name = "FILE")]
+        #[arg(value_name = "FILE")]
         files: Vec<String>,
     },
 

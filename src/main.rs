@@ -20,7 +20,7 @@ async fn main() {
 
     let result = match cli.command {
         Commands::Remove { duration, files } => remove_command(&config, duration, files).await,
-        Commands::Restore { files } => restore_command(files).await,
+        Commands::Restore { files, all } => restore_command(files, all).await,
         Commands::List => list_command().await,
     };
 
