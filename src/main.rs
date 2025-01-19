@@ -2,9 +2,9 @@ use std::process;
 
 use clap::Parser;
 use colored::Colorize;
-use srm::cli::Commands;
-use srm::commands::{clean_command, list_command, remove_command, restore_command, view_command};
-use srm::{cli::Cli, config::Config};
+use safe_remove::cli::Commands;
+use safe_remove::commands::{clean_command, list_command, remove_command, restore_command, view_command};
+use safe_remove::{cli::Cli, config::Config};
 
 #[tokio::main]
 async fn main() {
