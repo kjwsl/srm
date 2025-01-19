@@ -45,6 +45,7 @@ pub async fn remove_command(
         };
         let mut moved_path = storage.safe_dir.join(file_name);
 
+        // Handle duplicate file names
         if moved_path.exists() {
             let timestamp = Utc::now().format("%Y%m%d%H%M%S");
             let stem = path.file_stem().unwrap().to_string_lossy();
@@ -99,11 +100,20 @@ pub async fn restore_command(files: Vec<String>, restore_all: bool) -> Result<()
     storage.cleanup()?;
 
     let files_to_remove = if restore_all {
-        storage.get_safe_files().iter().map(|f| f.moved_path.file_name().unwrap().to_string_lossy().to_string()).collect()
+        storage
+            .get_safe_files()
+            .iter()
+            .map(|f| {
+                f.moved_path
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string()
+            })
+            .collect()
     } else {
         files
     };
-
 
     // Process each file before restoring
     for file_name in files_to_remove.iter() {
@@ -163,6 +173,17 @@ pub async fn list_command() -> Result<(), String> {
     storage.cleanup()?;
 
     storage.list_files();
+
+    Ok(())
+}
+
+pub async fn clean_command(force: bool) -> Result<(), String> {
+    let mut storage = StorageManager::new()?;
+    if force {
+        storage.cleanup_all_files()?;
+    } else {
+        storage.cleanup()?;
+    }
 
     Ok(())
 }

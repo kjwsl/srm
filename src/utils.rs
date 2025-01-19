@@ -17,4 +17,4 @@ pub fn parse_duration(s: &str) -> Result<Duration, String> {
         "d" => Ok(Duration::from_secs(num * 60 * 60 * 24)),
         _ => Err("Invalid duration unit".to_string()),
     }
-} 
+}
