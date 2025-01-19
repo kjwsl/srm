@@ -1,10 +1,14 @@
 # SRM (Safely Remove)
 
+![WARN] I'm still working on this project, so it's not ready for use yet.
+
 **srm** is a command-line program to delete files securely.
 
 ## Motivation
 
-The `rm` command is the most commonly used command to delete files in Unix-like operating systems. However, the `rm` command does not delete the file securely. The file can be recovered using data recovery tools. The `srm` command is used to delete files securely. The `srm` command overwrites the file with random data before deleting it. This makes it impossible to recover the file using data recovery tools.
+The `rm` command is the most commonly used command to delete files in Unix-like operating systems. However, it's really easy to accidentally delete important files with it, and never be able to restore it.
+
+`srm` is a safer alternative to `rm` that stores deleted files in a trash directory instead of deleting them permanently.
 
 ## Roadmap
 
