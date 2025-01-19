@@ -44,4 +44,11 @@ pub enum Commands {
         #[arg(short, long)]
         force: bool,
     },
+
+    /// View the contents of files
+    View {
+        /// File to view
+        #[arg(required = true, value_name = "FILE")]
+        files: Vec<String>,
+    },
 }
