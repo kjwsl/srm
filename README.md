@@ -1,6 +1,7 @@
 # SRM (Safely Remove)
 
-[!CAUTION] I'm still working on this project, so it's not ready for use yet.
+> [!CAUTION]
+> I'm still working on this project, so it's not ready for use yet.
 
 **srm** is a command-line program to delete files securely.
 
