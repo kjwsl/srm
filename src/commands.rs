@@ -1,4 +1,9 @@
-use std::{fs, path::PathBuf, time::Duration};
+use std::{
+    fs,
+    path::PathBuf,
+    process::{Command, Stdio},
+    time::Duration,
+};
 
 use chrono::Utc;
 use colored::Colorize;
@@ -30,7 +35,9 @@ pub async fn remove_command(
     storage.cleanup()?;
 
     for file in files {
-        let path = PathBuf::from(&file);
+        let path = PathBuf::from(&file)
+            .canonicalize()
+            .map_err(|e| e.to_string())?;
         if !path.exists() {
             eprintln!("{}: File does not exist: {}", "Error".red(), file);
             continue;
@@ -82,9 +89,13 @@ pub async fn remove_command(
 
         println!(
             "{} '{}' {}",
-            "Moved".green(),
-            file,
-            format!("to safe storage. It will be deleted at {}", deleted_at).blue()
+            "Moved".blue(),
+            file.green(),
+            format!(
+                "to safe storage. It will be deleted at {}",
+                deleted_at.with_timezone(&chrono::Local)
+            )
+            .blue()
         );
     }
 
@@ -155,7 +166,13 @@ pub async fn restore_command(files: Vec<String>, restore_all: bool) -> Result<()
             continue;
         }
 
-        println!("{} '{}'", "Restored".green(), file_name);
+        println!(
+            "{} '{}' {} '{}'",
+            "Restored".green(),
+            file_name.blue(),
+            "to".green(),
+            safe_file.original_path.display().to_string().blue()
+        );
 
         // Remove the file from the safe storage metadata
         storage.remove_file(&safe_file.moved_path);
@@ -186,4 +203,69 @@ pub async fn clean_command(force: bool) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+pub async fn view_command(files: Vec<String>) -> Result<(), String> {
+    let storage = StorageManager::new()?;
+
+    for file_name in files.iter() {
+        let safe_file = match storage.find_safe_file(file_name) {
+            Some(f) => f,
+            None => {
+                eprintln!(
+                    "{}: File not found in safe storage: {}",
+                    "Error".red(),
+                    file_name
+                );
+                continue;
+            }
+        };
+
+        if !safe_file.moved_path.exists() {
+            eprintln!(
+                "{}: File not found in safe storage: {}",
+                "Error".red(),
+                file_name
+            );
+            continue;
+        }
+
+        let view_cmd = if is_bat_installed() {
+            "bat"
+        } else {
+            println!(
+                "{}: bat is not installed. Using 'cat' instead.",
+                "Warning".yellow()
+            );
+            "cat"
+        };
+
+        let status = Command::new(view_cmd)
+            .arg(&safe_file.moved_path)
+            .status()
+            .map_err(|e| e.to_string())?;
+
+        if !status.success() {
+            eprintln!(
+                "{}: Failed to view file '{}': bat exited with status {}",
+                "Error".red(),
+                file_name,
+                status
+            );
+        }
+    }
+
+    Ok(())
+}
+
+fn is_bat_installed() -> bool {
+    match Command::new("bat")
+        .arg("--version")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+    {
+        Ok(status) => status.success(),
+        Err(e) => false,
+    }
 }
