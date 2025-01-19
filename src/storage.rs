@@ -97,6 +97,10 @@ impl StorageManager {
         self.save_metadata()
     }
 
+    pub fn get_safe_files(&self) -> Vec<&SafeFile> {
+        self.safe_files.iter().collect()
+    }
+
     pub fn list_files(&self) {
         if self.safe_files.is_empty() {
             println!("No files stored in the safe storage");
@@ -116,9 +120,28 @@ impl StorageManager {
                 .unwrap_or_default()
                 .to_string_lossy();
             let original_path = file.original_path.to_string_lossy();
-            let deleted_at = file.deleted_at.to_rfc3339();
+            let deleted_at = file.deleted_at.with_timezone(&chrono::Local).to_rfc3339();
 
             println!("{:<30} {:<50} {:<25}", file_name, original_path, deleted_at);
         }
+    }
+
+    pub fn cleanup_all_files(&mut self) -> Result<(), String> {
+        self.safe_files.iter().for_each(|f| {
+            if let Err(e) = fs::remove_file(&f.moved_path) {
+                eprintln!("Failed to delete {:?}: {}", f.moved_path, e);
+            } else {
+                println!(
+                    "Deleted '{}' from safe storage",
+                    f.moved_path
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                );
+            }
+        });
+
+        self.safe_files.clear();
+        self.save_metadata()
     }
 }

@@ -37,14 +37,15 @@ pub async fn remove_command(
         }
 
         let file_name = match path.file_name() {
-            Some(name) => name.to_owned(),
+            Some(name) => name,
             None => {
                 eprintln!("{}: Invalid file name:  {}", "Error".red(), file);
                 continue;
             }
         };
-        let mut moved_path = storage.safe_dir.join(&file_name);
+        let mut moved_path = storage.safe_dir.join(file_name);
 
+        // Handle duplicate file names
         if moved_path.exists() {
             let timestamp = Utc::now().format("%Y%m%d%H%M%S");
             let stem = path.file_stem().unwrap().to_string_lossy();
@@ -92,14 +93,30 @@ pub async fn remove_command(
     Ok(())
 }
 
-pub async fn restore_command(files: Vec<String>) -> Result<(), String> {
+pub async fn restore_command(files: Vec<String>, restore_all: bool) -> Result<(), String> {
     let mut storage = StorageManager::new()?;
 
     // Perform cleanup before restoring
     storage.cleanup()?;
 
+    let files_to_remove = if restore_all {
+        storage
+            .get_safe_files()
+            .iter()
+            .map(|f| {
+                f.moved_path
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string()
+            })
+            .collect()
+    } else {
+        files
+    };
+
     // Process each file before restoring
-    for file_name in files.iter() {
+    for file_name in files_to_remove.iter() {
         let safe_file = match storage.find_safe_file(file_name) {
             Some(f) => f.clone(),
             None => {
@@ -156,6 +173,17 @@ pub async fn list_command() -> Result<(), String> {
     storage.cleanup()?;
 
     storage.list_files();
+
+    Ok(())
+}
+
+pub async fn clean_command(force: bool) -> Result<(), String> {
+    let mut storage = StorageManager::new()?;
+    if force {
+        storage.cleanup_all_files()?;
+    } else {
+        storage.cleanup()?;
+    }
 
     Ok(())
 }
