@@ -1,6 +1,6 @@
 [package]
 name = "safe-remove"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["ray <kjwdev01@gmail.com> "]
 description = "Safe Remove (srm): Move files to a safe location instead of deleting them immediately."
