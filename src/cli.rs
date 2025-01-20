@@ -51,4 +51,31 @@ pub enum Commands {
         #[arg(required = true, value_name = "FILE")]
         files: Vec<String>,
     },
+
+    /// Configure the application
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction,
+    }
+}
+
+#[derive(Subcommand, Debug)]
+pub enum ConfigAction {
+    /// Set a configuration key to a specific value
+    Set {
+        /// Configuration key to set (e.g., "default_duration")
+        #[arg(value_name = "KEY")]
+        key: String,
+
+        /// Value to assign to the key (e.g., "7d")
+        #[arg(value_name = "VALUE")]
+        value: String,
+    },
+
+    /// Get the value of a configuration key
+    Get {
+        /// Configuration key to retrieve
+        #[arg(value_name = "KEY")]
+        key: String,
+    }
 }
