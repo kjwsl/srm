@@ -48,9 +48,9 @@ impl Config {
             _ => return Err(format!("Unknown key: {}", key)),
         }
 
-        let contents =
-            serde_yaml::to_string(&config).map_err(|e| format!("Failed to serialize config: {}", e))?;
-        // ensure the parent directory exists 
+        let contents = serde_yaml::to_string(&config)
+            .map_err(|e| format!("Failed to serialize config: {}", e))?;
+        // ensure the parent directory exists
         fs::create_dir_all(config_path)
             .map_err(|e| format!("Failed to create config directory: {}", e))?;
 

@@ -56,7 +56,7 @@ pub enum Commands {
     Config {
         #[command(subcommand)]
         action: ConfigAction,
-    }
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -77,5 +77,5 @@ pub enum ConfigAction {
         /// Configuration key to retrieve
         #[arg(value_name = "KEY")]
         key: String,
-    }
+    },
 }
