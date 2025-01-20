@@ -26,6 +26,12 @@ async fn main() {
         Commands::List => list_command().await,
         Commands::Clean { force } => clean_command(force).await,
         Commands::View { files } => view_command(files).await,
+        Commands::Config { action } => match action {
+            safe_remove::cli::ConfigAction::Set { key, value } => {
+                config.set(key, value).map(|_| ())
+            }
+            safe_remove::cli::ConfigAction::Get { key } => config.get(key),
+        },
     };
 
     if let Err(e) = result {
