@@ -17,3 +17,7 @@ serde_json = "1.0"
 serde_yaml = "0.9"
 tokio = { version = "1.43", features = ["full"] }
 toml = "0.8"
+
+[[bin]]
+name = "srm"
+path = "src/main.rs"
