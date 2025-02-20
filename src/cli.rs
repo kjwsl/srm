@@ -57,6 +57,13 @@ pub enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+
+    /// Start the daemon to monitor trash files
+    Daemon {
+        /// Check interval in seconds
+        #[arg(short, long, default_value = "300")]
+        interval: u64,
+    },
 }
 
 #[derive(Subcommand, Debug)]
