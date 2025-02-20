@@ -1,0 +1,13 @@
+Source: srm
+Section: utils
+Priority: optional
+Maintainer: ray <kjwdev01@gmail.com>
+Build-Depends: debhelper (>= 11), cargo, rustc
+
+Package: srm
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Safely Remove (srm) - A safer alternative to rm
+ SRM is a command-line program that stores deleted files in a trash directory
+ instead of deleting them permanently. It includes a daemon that automatically
+ cleans up expired files. 

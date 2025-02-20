@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+    systemctl daemon-reload
+    systemctl enable srm.service
+    systemctl start srm.service
+fi
+
+#DEBHELPER# 
