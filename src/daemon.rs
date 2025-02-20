@@ -54,23 +54,25 @@ impl TrashDaemon {
 pub async fn start_daemon(interval: u64) -> Result<(), String> {
     let mut daemon = TrashDaemon::new(Duration::from_secs(interval))?;
     
-    // Initialize daemon before starting tokio operations
     let proj_dirs = directories::ProjectDirs::from("com", "larpi", "srm")
         .ok_or_else(|| "Cannot determine project directories".to_string())?;
     let runtime_dir = proj_dirs.runtime_dir().unwrap_or(proj_dirs.data_dir());
     let pid_file = runtime_dir.join("daemon.pid");
 
+    if pid_file.exists() {
+        return Err("Daemon is already running. Use 'systemctl stop srm' to stop it.".to_string());
+    }
+
     fs::create_dir_all(runtime_dir)
         .map_err(|e| format!("Failed to create runtime directory: {}", e))?;
 
     let daemonize = Daemonize::new()
-        .pid_file(pid_file)
+        .pid_file(&pid_file)
         .chown_pid_file(true)
         .working_directory(runtime_dir)
         .umask(0o027);
 
     daemonize.start().map_err(|e| format!("Error starting daemon: {}", e))?;
     
-    // Now start the daemon loop
     daemon.start().await
 } 
