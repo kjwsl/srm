@@ -1,0 +1,11 @@
+[Unit]
+Description=SRM (Safely Remove) Daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/srm daemon
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

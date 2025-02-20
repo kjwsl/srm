@@ -6,6 +6,10 @@ authors = ["ray <kjwdev01@gmail.com> "]
 description = "Safe Remove (srm): Move files to a safe location instead of deleting them immediately."
 license = "MIT" 
 repository = "https://github.com/kjwsl/srm"
+include = [
+    "daemon/*",
+    "install.sh"
+]
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
